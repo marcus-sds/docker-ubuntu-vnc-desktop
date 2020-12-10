@@ -23,6 +23,9 @@ RUN apt update \
     && apt autoclean -y \
     && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*
+# LANG
+RUN apt update && apt-get install -y language-pack-th
+
 # install debs error if combine together
 RUN apt update \
     && apt install -y --no-install-recommends --allow-unauthenticated \
@@ -43,7 +46,8 @@ RUN apt update \
 
 RUN apt update \
     && apt install -y --no-install-recommends --allow-unauthenticated \
-        lxqt openbox lxqt-themes \
+        lxqt openbox lxqt-themes language-selector-common \
+    && apt-get install `check-language-support -l th` -y \
     && apt autoclean -y \
     && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*
@@ -122,6 +126,8 @@ COPY --from=builder /src/web/dist/ /usr/local/lib/web/frontend/
 COPY rootfs /
 RUN ln -sf /usr/local/lib/web/frontend/static/websockify /usr/local/lib/web/frontend/static/novnc/utils/websockify && \
 	chmod +x /usr/local/lib/web/frontend/static/websockify/run
+# LANG
+RUN apt update && apt-get install -y language-pack-th
 
 EXPOSE 80
 WORKDIR /root
