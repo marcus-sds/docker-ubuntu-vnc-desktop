@@ -23,8 +23,6 @@ RUN apt update \
     && apt autoclean -y \
     && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*
-# LANG
-RUN apt update && apt-get install -y language-pack-th
 
 # install debs error if combine together
 RUN apt update \
@@ -54,6 +52,9 @@ RUN apt update \
  
 # Additional packages require ~600MB
 # libreoffice  pinta language-pack-zh-hant language-pack-gnome-zh-hant firefox-locale-zh-hant libreoffice-l10n-zh-tw
+
+# OFFICE
+RUN add-apt-repository ppa:libreoffice/ppa && apt-get install -y libreoffice
 
 # tini to fix subreap
 ARG TINI_VERSION=v0.18.0
@@ -127,7 +128,7 @@ COPY rootfs /
 RUN ln -sf /usr/local/lib/web/frontend/static/websockify /usr/local/lib/web/frontend/static/novnc/utils/websockify && \
 	chmod +x /usr/local/lib/web/frontend/static/websockify/run
 # LANG
-RUN apt update && apt-get install -y language-pack-th
+#RUN echo -e "\nLANG=\"ko_KR.UTF-8\"\nLANGUAGE=\"ko:en\"" > /etc/default/locale
 
 EXPOSE 80
 WORKDIR /root
