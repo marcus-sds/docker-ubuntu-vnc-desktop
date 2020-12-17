@@ -17,7 +17,7 @@ RUN apt update \
     && apt install -y --no-install-recommends software-properties-common curl apache2-utils \
     && apt update \
     && apt install -y --no-install-recommends --allow-unauthenticated \
-        supervisor nginx sudo net-tools zenity xz-utils \
+        supervisor nginx sudo zenity xz-utils \
         dbus-x11 x11-utils alsa-utils \
         mesa-utils libgl1-mesa-dri \
     && apt autoclean -y \
@@ -46,10 +46,16 @@ RUN apt update \
     && apt install -y --no-install-recommends --allow-unauthenticated \
         lxqt openbox lxqt-themes language-selector-common \
     && apt-get install `check-language-support -l th` -y \
+    && apt install -y openssh-client \
     && apt autoclean -y \
     && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*
- 
+
+# postman installation
+RUN curl https://dl.pstmn.io/download/latest/linux64 -o postman-linux-x64.tar.gz \
+    && tar -xzf postman-linux-x64.tar.gz -C /opt\
+    && ln -s /opt/Postman/Postman /usr/local/bin/postman \
+    && rm -f postman-linux-x64.tar.gz
 # Additional packages require ~600MB
 # libreoffice  pinta language-pack-zh-hant language-pack-gnome-zh-hant firefox-locale-zh-hant libreoffice-l10n-zh-tw
 
@@ -129,10 +135,17 @@ RUN ln -sf /usr/local/lib/web/frontend/static/websockify /usr/local/lib/web/fron
 	chmod +x /usr/local/lib/web/frontend/static/websockify/run
 # LANG
 #RUN echo -e "\nLANG=\"ko_KR.UTF-8\"\nLANGUAGE=\"ko:en\"" > /etc/default/locale
+COPY utils/desktop/*.desktop /usr/share/applications/
+
+# Security
+RUN chmod 750 /usr/bin/ssh
 
 EXPOSE 80
 WORKDIR /root
 ENV HOME=/root \
-    SHELL=/bin/bash
+    SHELL=/bin/bash \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
 HEALTHCHECK --interval=30s --timeout=5s CMD curl --fail http://127.0.0.1:6079/api/health
 ENTRYPOINT ["/startup.sh"]
